@@ -1,4 +1,4 @@
-// VLC Stream Extension - Content Script
+// Vid2VLC - Content Script
 
 // Listen for messages from background script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {

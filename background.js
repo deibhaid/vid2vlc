@@ -1,4 +1,4 @@
-// VLC Stream Extension - Background Script
+// Vid2VLC - Background Script
 
 let vlcPath = '';
 

@@ -1,4 +1,4 @@
-// VLC Stream Extension - Popup Script
+// Vid2VLC - Popup Script
 
 const DEFAULT_PATHS = {
   'mac': '/Applications/VLC.app/Contents/MacOS/VLC',

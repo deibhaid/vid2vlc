@@ -1,4 +1,4 @@
-# VLC Stream Extension
+# Vid2VLC
 
 A Chrome extension that allows you to stream videos from any webpage directly to VLC Media Player.
 
@@ -17,7 +17,7 @@ A Chrome extension that allows you to stream videos from any webpage directly to
 1. Clone or download this repository to your local machine
 2. Open Chrome and navigate to `chrome://extensions/`
 3. Enable "Developer mode" in the top-right corner
-4. Click "Load unpacked" and select the `vlc-stream-extension` folder
+4. Click "Load unpacked" and select the `vid2vlc` folder
 5. The extension icon should now appear in your browser toolbar
 
 ### 2. Create Extension Icons
@@ -25,7 +25,7 @@ A Chrome extension that allows you to stream videos from any webpage directly to
 The extension requires icon files. Create simple icons or use the following commands to generate placeholder icons:
 
 ```bash
-cd /Users/dbryso/ws/misc/vlc-stream-extension
+cd vid2vlc
 mkdir -p icons
 # You'll need to add actual PNG files here (16x16, 48x48, 128x128)
 ```
@@ -124,7 +124,7 @@ The extension can detect and stream:
 
 ### File Structure
 ```
-vlc-stream-extension/
+vid2vlc/
 ├── manifest.json       # Extension configuration
 ├── background.js       # Background service worker
 ├── content.js          # Content script for page interaction
