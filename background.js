@@ -53,7 +53,7 @@ async function handleSingleStream(info, tab) {
   }
 
   if (videoUrl) {
-    launchVLC([videoUrl]);
+    launchVLC([videoUrl], videoUrl);  // Use video URL for filename
     chrome.notifications.create({
       type: 'basic',
       iconUrl: 'icons/icon48.png',
@@ -74,7 +74,7 @@ async function handleAllVideos(tab) {
   const videos = await getVideosFromPage(tab.id);
   
   if (videos && videos.length > 0) {
-    launchVLC(videos);
+    launchVLC(videos, tab.url);  // Use page URL for filename
     chrome.notifications.create({
       type: 'basic',
       iconUrl: 'icons/icon48.png',
@@ -145,20 +145,20 @@ async function getVideosFromPage(tabId) {
   }
 }
 
-function launchVLC(urls) {
+function launchVLC(urls, baseUrl) {
   // Always use M3U playlist download for reliability across all OSes
-  downloadM3UPlaylist(urls);
+  downloadM3UPlaylist(urls, baseUrl);
 }
 
-function downloadM3UPlaylist(urls) {
+function downloadM3UPlaylist(urls, baseUrl) {
   // Create M3U playlist content
   const playlistContent = createM3UPlaylist(urls);
   
-  // Generate filename based on first URL
-  const filename = generatePlaylistFilename(urls[0]);
+  // Generate filename based on baseUrl (page URL for "all videos", video URL for single)
+  const filename = generatePlaylistFilename(baseUrl);
   
   console.log('Downloading playlist with filename:', filename);
-  console.log('First URL:', urls[0]);
+  console.log('Base URL:', baseUrl);
   
   // Inject script into page to handle download with proper blob URL
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
