@@ -186,24 +186,30 @@ function downloadM3UPlaylist(urls, baseUrl) {
 function generatePlaylistFilename(url) {
   try {
     const urlObj = new URL(url);
+    
+    // Get hostname (without port)
+    let hostname = urlObj.hostname.replace(/[^a-zA-Z0-9]/g, '_');
+    
     // Get the pathname from the URL and decode it
     let path = decodeURIComponent(urlObj.pathname);
     // Remove leading and trailing slashes
     path = path.replace(/^\/|\/$/g, '');
     
     if (path) {
-      // Replace slashes with underscores and remove file extension if present
-      let filename = path.replace(/\//g, '_');
+      // Replace slashes with underscores
+      let pathPart = path.replace(/\//g, '_');
       // Remove the file extension from the last segment if it exists
-      filename = filename.replace(/\.[^._]+$/, '');
+      pathPart = pathPart.replace(/\.[^._]+$/, '');
       // Replace any remaining special characters with underscores
-      filename = filename.replace(/[^a-zA-Z0-9_.-]/g, '_');
-      // Clean up any double underscores and limit length
-      filename = filename.replace(/__+/g, '_').substring(0, 100);
+      pathPart = pathPart.replace(/[^a-zA-Z0-9_.-]/g, '_');
+      // Clean up any double underscores
+      pathPart = pathPart.replace(/__+/g, '_');
+      
+      // Combine hostname and path, limit total length
+      const filename = (hostname + '_' + pathPart).substring(0, 100);
       return filename + '.m3u';
     } else {
-      // Use hostname if no path
-      const hostname = urlObj.hostname.replace(/[^a-zA-Z0-9]/g, '_');
+      // Just use hostname if no path
       return hostname + '.m3u';
     }
   } catch (error) {
