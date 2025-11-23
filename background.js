@@ -143,20 +143,14 @@ function downloadM3UPlaylist(urls) {
   // Create M3U playlist content
   const playlistContent = createM3UPlaylist(urls);
   
-  // Create blob and download
-  const blob = new Blob([playlistContent], { type: 'audio/x-mpegurl' });
-  const url = URL.createObjectURL(blob);
+  // Convert to data URL (works in service workers)
+  const dataUrl = 'data:audio/x-mpegurl;charset=utf-8,' + encodeURIComponent(playlistContent);
   const timestamp = new Date().getTime();
   
   chrome.downloads.download({
-    url: url,
+    url: dataUrl,
     filename: `vid2vlc_playlist_${timestamp}.m3u`,
     saveAs: false
-  }, (downloadId) => {
-    // Revoke object URL after download starts
-    setTimeout(() => {
-      URL.revokeObjectURL(url);
-    }, 1000);
   });
 }
 
