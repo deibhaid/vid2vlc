@@ -186,8 +186,8 @@ function downloadM3UPlaylist(urls) {
 function generatePlaylistFilename(url) {
   try {
     const urlObj = new URL(url);
-    // Get the pathname from the URL
-    let path = urlObj.pathname;
+    // Get the pathname from the URL and decode it
+    let path = decodeURIComponent(urlObj.pathname);
     // Remove leading and trailing slashes
     path = path.replace(/^\/|\/$/g, '');
     
@@ -196,6 +196,8 @@ function generatePlaylistFilename(url) {
       let filename = path.replace(/\//g, '_');
       // Remove the file extension from the last segment if it exists
       filename = filename.replace(/\.[^._]+$/, '');
+      // Replace any remaining special characters with underscores
+      filename = filename.replace(/[^a-zA-Z0-9_.-]/g, '_');
       // Clean up any double underscores and limit length
       filename = filename.replace(/__+/g, '_').substring(0, 100);
       return filename + '.m3u';
