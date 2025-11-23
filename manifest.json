@@ -5,10 +5,9 @@
   "description": "Stream videos to VLC from any webpage",
   "permissions": [
     "contextMenus",
-    "storage",
     "activeTab",
-    "nativeMessaging",
-    "downloads"
+    "downloads",
+    "notifications"
   ],
   "host_permissions": [
     "<all_urls>"

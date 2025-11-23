@@ -1,32 +1,9 @@
 // Vid2VLC - Background Script
 
-let vlcPath = '';
-
-// Default VLC paths for different operating systems
-const DEFAULT_VLC_PATHS = {
-  'mac': '/Applications/VLC.app/Contents/MacOS/VLC',
-  'windows': 'C:\\Program Files\\VideoLAN\\VLC\\vlc.exe',
-  'linux': '/usr/bin/vlc'
-};
-
 // Initialize extension
 chrome.runtime.onInstalled.addListener(async () => {
-  // Load saved VLC path or set default
-  const result = await chrome.storage.sync.get(['vlcPath', 'os']);
-  if (result.vlcPath) {
-    vlcPath = result.vlcPath;
-  }
-
   // Create context menus
   createContextMenus();
-});
-
-// Load VLC path on startup
-chrome.runtime.onStartup.addListener(async () => {
-  const result = await chrome.storage.sync.get(['vlcPath']);
-  if (result.vlcPath) {
-    vlcPath = result.vlcPath;
-  }
 });
 
 function createContextMenus() {
@@ -50,30 +27,14 @@ function createContextMenus() {
 
 // Handle context menu clicks
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
-  // Get VLC path from storage
-  const result = await chrome.storage.sync.get(['vlcPath', 'os']);
-  const configuredPath = result.vlcPath;
-  const os = result.os || detectOS();
-
-  if (!configuredPath) {
-    // Show notification to configure VLC path
-    chrome.notifications.create({
-      type: 'basic',
-      iconUrl: 'icons/icon48.png',
-      title: 'VLC Path Not Configured',
-      message: 'Please click the extension icon to configure your VLC path.'
-    });
-    return;
-  }
-
   if (info.menuItemId === 'streamToVLC') {
-    handleSingleStream(info, tab, configuredPath, os);
+    handleSingleStream(info, tab);
   } else if (info.menuItemId === 'addAllToVLC') {
-    handleAllVideos(tab, configuredPath, os);
+    handleAllVideos(tab);
   }
 });
 
-async function handleSingleStream(info, tab, vlcPath, os) {
+async function handleSingleStream(info, tab) {
   let videoUrl = null;
 
   // Try to get URL from different sources
@@ -92,7 +53,13 @@ async function handleSingleStream(info, tab, vlcPath, os) {
   }
 
   if (videoUrl) {
-    launchVLC([videoUrl], vlcPath, os);
+    launchVLC([videoUrl]);
+    chrome.notifications.create({
+      type: 'basic',
+      iconUrl: 'icons/icon48.png',
+      title: 'Playlist Downloaded',
+      message: 'Open the .m3u file with VLC to start streaming.'
+    });
   } else {
     chrome.notifications.create({
       type: 'basic',
@@ -103,16 +70,16 @@ async function handleSingleStream(info, tab, vlcPath, os) {
   }
 }
 
-async function handleAllVideos(tab, vlcPath, os) {
+async function handleAllVideos(tab) {
   const videos = await getVideosFromPage(tab.id);
   
   if (videos && videos.length > 0) {
-    launchVLC(videos, vlcPath, os);
+    launchVLC(videos);
     chrome.notifications.create({
       type: 'basic',
       iconUrl: 'icons/icon48.png',
-      title: 'Added to VLC Playlist',
-      message: `Added ${videos.length} video(s) to VLC playlist.`
+      title: 'Playlist Downloaded',
+      message: `Created playlist with ${videos.length} video(s). Open the .m3u file with VLC.`
     });
   } else {
     chrome.notifications.create({
@@ -167,19 +134,9 @@ async function getVideosFromPage(tabId) {
   }
 }
 
-function launchVLC(urls, vlcPath, os) {
-  // For single video, try vlc:// protocol
-  if (urls.length === 1) {
-    const vlcUrl = `vlc://${urls[0]}`;
-    chrome.tabs.create({ url: vlcUrl, active: false }, (tab) => {
-      setTimeout(() => {
-        chrome.tabs.remove(tab.id);
-      }, 1000);
-    });
-  } else {
-    // For multiple videos, download M3U playlist file
-    downloadM3UPlaylist(urls);
-  }
+function launchVLC(urls) {
+  // Always use M3U playlist download for reliability across all OSes
+  downloadM3UPlaylist(urls);
 }
 
 function downloadM3UPlaylist(urls) {
@@ -212,23 +169,17 @@ function createM3UPlaylist(urls) {
   return playlist;
 }
 
-function detectOS() {
-  const userAgent = navigator.userAgent.toLowerCase();
-  if (userAgent.includes('mac')) return 'mac';
-  if (userAgent.includes('win')) return 'windows';
-  if (userAgent.includes('linux')) return 'linux';
-  return 'unknown';
-}
-
 // Listen for messages from popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === 'updateVLCPath') {
-    vlcPath = request.path;
-    sendResponse({ success: true });
-  } else if (request.action === 'testVLC') {
+  if (request.action === 'testVLC') {
     // Test VLC with a sample URL
-    launchVLC(['http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'], 
-              request.path, request.os);
+    launchVLC(['http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4']);
+    chrome.notifications.create({
+      type: 'basic',
+      iconUrl: 'icons/icon48.png',
+      title: 'Test Playlist Downloaded',
+      message: 'Open the .m3u file with VLC to test the connection.'
+    });
     sendResponse({ success: true });
   }
   return true;

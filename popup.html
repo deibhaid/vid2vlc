@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vid2VLC Settings</title>
+  <title>Vid2VLC</title>
   <style>
     * {
       margin: 0;
@@ -12,7 +12,7 @@
     }
 
     body {
-      width: 450px;
+      width: 400px;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: #333;
@@ -54,138 +54,70 @@
       margin-bottom: 24px;
     }
 
-    .section {
-      margin-bottom: 24px;
-    }
-
-    .section-title {
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 12px;
-      color: #333;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .os-selector {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
-    .os-btn {
-      flex: 1;
-      padding: 12px;
-      border: 2px solid #e0e0e0;
-      background: white;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 500;
-      transition: all 0.2s;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .os-btn:hover {
-      border-color: #667eea;
-      background: #f5f7ff;
-    }
-
-    .os-btn.active {
-      border-color: #667eea;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-    }
-
-    .os-icon {
-      font-size: 20px;
-    }
-
-    .input-group {
-      margin-bottom: 16px;
-    }
-
-    label {
-      display: block;
-      font-size: 13px;
-      font-weight: 500;
-      margin-bottom: 6px;
-      color: #555;
-    }
-
-    input[type="text"] {
-      width: 100%;
-      padding: 12px;
-      border: 2px solid #e0e0e0;
-      border-radius: 6px;
-      font-size: 13px;
-      font-family: 'Courier New', monospace;
-      transition: border-color 0.2s;
-    }
-
-    input[type="text"]:focus {
-      outline: none;
-      border-color: #667eea;
-    }
-
-    .default-path {
-      font-size: 12px;
-      color: #888;
-      margin-top: 4px;
-      font-family: 'Courier New', monospace;
-      background: #f5f5f5;
-      padding: 8px;
+    .info-box {
+      background: #f8f9fa;
+      border-left: 4px solid #667eea;
+      padding: 16px;
       border-radius: 4px;
+      font-size: 13px;
+      color: #555;
+      line-height: 1.6;
+      margin-bottom: 20px;
     }
 
-    .button-group {
-      display: flex;
-      gap: 8px;
-      margin-top: 20px;
+    .info-box strong {
+      color: #333;
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .info-box ul {
+      margin-top: 8px;
+      margin-left: 20px;
+    }
+
+    .info-box li {
+      margin: 4px 0;
+    }
+
+    .steps {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 16px;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #856404;
+      margin-bottom: 20px;
+    }
+
+    .steps strong {
+      display: block;
+      margin-bottom: 8px;
+      color: #856404;
+    }
+
+    .steps ol {
+      margin-left: 20px;
+      line-height: 1.6;
     }
 
     button {
-      flex: 1;
-      padding: 12px 20px;
+      width: 100%;
+      padding: 14px 20px;
       border: none;
       border-radius: 6px;
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
-    }
-
-    .btn-primary {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
     }
 
-    .btn-primary:hover {
+    button:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-    }
-
-    .btn-secondary {
-      background: #f0f0f0;
-      color: #333;
-    }
-
-    .btn-secondary:hover {
-      background: #e0e0e0;
-    }
-
-    .btn-test {
-      background: #4caf50;
-      color: white;
-    }
-
-    .btn-test:hover {
-      background: #45a049;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
     }
 
     .status {
@@ -200,34 +132,39 @@
       background: #d4edda;
       color: #155724;
       border: 1px solid #c3e6cb;
-    }
-
-    .status.error {
-      background: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
+      display: block;
     }
 
     .status.info {
       background: #d1ecf1;
       color: #0c5460;
       border: 1px solid #bee5eb;
-    }
-
-    .info-box {
-      background: #f8f9fa;
-      border-left: 4px solid #667eea;
-      padding: 12px;
-      margin-top: 16px;
-      border-radius: 4px;
-      font-size: 12px;
-      color: #666;
-    }
-
-    .info-box strong {
-      color: #333;
       display: block;
-      margin-bottom: 4px;
+    }
+
+    .feature-list {
+      background: #e7f3ff;
+      border-left: 4px solid #2196F3;
+      padding: 16px;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #014361;
+      margin-top: 20px;
+    }
+
+    .feature-list strong {
+      display: block;
+      margin-bottom: 8px;
+      color: #014361;
+    }
+
+    .feature-list ul {
+      margin-left: 20px;
+      line-height: 1.6;
+    }
+
+    .feature-list li {
+      margin: 6px 0;
     }
   </style>
 </head>
@@ -235,54 +172,40 @@
   <div class="container">
     <h1>
       <div class="icon">VLC</div>
-      Vid2VLC Settings
+      Vid2VLC
     </h1>
-    <p class="subtitle">Configure VLC path for streaming videos</p>
-
-    <div class="section">
-      <div class="section-title">Operating System</div>
-      <div class="os-selector">
-        <button class="os-btn" data-os="mac">
-          <span class="os-icon">🍎</span>
-          <span>macOS</span>
-        </button>
-        <button class="os-btn" data-os="windows">
-          <span class="os-icon">🪟</span>
-          <span>Windows</span>
-        </button>
-        <button class="os-btn" data-os="linux">
-          <span class="os-icon">🐧</span>
-          <span>Linux</span>
-        </button>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-title">VLC Path Configuration</div>
-      
-      <div class="input-group">
-        <label for="vlcPath">VLC Executable Path:</label>
-        <input type="text" id="vlcPath" placeholder="Enter custom VLC path or use default">
-        <div class="default-path" id="defaultPath">
-          Default: <span id="defaultPathText"></span>
-        </div>
-      </div>
-
-      <div class="button-group">
-        <button class="btn-secondary" id="useDefaultBtn">Use Default</button>
-        <button class="btn-test" id="testBtn">Test VLC</button>
-        <button class="btn-primary" id="saveBtn">Save</button>
-      </div>
-
-      <div class="status" id="status"></div>
-    </div>
+    <p class="subtitle">Stream web videos to VLC Media Player</p>
 
     <div class="info-box">
-      <strong>How to use:</strong>
-      Right-click on any video or page with videos and select:
-      <ul style="margin-top: 8px; margin-left: 20px;">
-        <li>"Add Stream to VLC" - Stream single video</li>
-        <li>"Add All Videos to VLC Playlist" - Add all videos on page</li>
+      <strong>📺 How to use:</strong>
+      Right-click on any video or page with videos:
+      <ul>
+        <li><strong>"Add Stream to VLC"</strong> - Download playlist for single video</li>
+        <li><strong>"Add All Videos to VLC Playlist"</strong> - Download playlist with all videos on page</li>
+      </ul>
+    </div>
+
+    <div class="steps">
+      <strong>🎬 Quick Start:</strong>
+      <ol>
+        <li>Right-click on a video or page</li>
+        <li>Select a Vid2VLC option</li>
+        <li>Open the downloaded <code>.m3u</code> file with VLC</li>
+        <li>Enjoy streaming!</li>
+      </ol>
+    </div>
+
+    <button id="testBtn">🎥 Test with Sample Video</button>
+
+    <div class="status" id="status"></div>
+
+    <div class="feature-list">
+      <strong>✨ Features:</strong>
+      <ul>
+        <li>Works on all platforms (Linux, macOS, Windows)</li>
+        <li>No configuration required</li>
+        <li>Detects multiple video formats</li>
+        <li>Creates standard M3U playlists</li>
       </ul>
     </div>
   </div>
@@ -290,4 +213,3 @@
   <script src="popup.js"></script>
 </body>
 </html>
-

@@ -1,14 +1,15 @@
 # Vid2VLC
 
-A Chrome extension that allows you to stream videos from any webpage directly to VLC Media Player.
+A Chrome extension that streams videos from any webpage directly to VLC Media Player using M3U playlists.
 
 ## Features
 
-- **Context Menu Integration**: Right-click on videos to stream them to VLC
-- **Batch Streaming**: Add all videos on a page to VLC playlist with one click
-- **Cross-Platform Support**: Works on macOS, Windows, and Linux
-- **Configurable VLC Path**: Set custom VLC installation path or use defaults
-- **Beautiful UI**: Modern, gradient-styled settings popup
+- **Context Menu Integration**: Right-click on videos to create VLC playlists
+- **Batch Streaming**: Add all videos on a page to a single VLC playlist
+- **Cross-Platform**: Works on macOS, Windows, and Linux
+- **No Configuration**: Zero setup required - just install and use
+- **Universal Compatibility**: Creates standard M3U playlist files
+- **Beautiful UI**: Modern, gradient-styled interface
 
 ## Installation
 
@@ -26,75 +27,34 @@ The extension requires icon files. Create simple icons or use the following comm
 
 ```bash
 cd vid2vlc
-mkdir -p icons
-# You'll need to add actual PNG files here (16x16, 48x48, 128x128)
+python3 generate_icons.py
 ```
 
-### 3. Configure VLC Protocol Handler
-
-For the extension to launch VLC, you need to register the `vlc://` protocol handler:
-
-#### macOS:
-VLC on macOS typically registers the protocol automatically. If not, you can use this AppleScript:
-
-```bash
-# Create a URL handler app
-cat > ~/Library/Application\ Support/vlc-handler.sh << 'EOF'
-#!/bin/bash
-url="${1#vlc://}"
-/Applications/VLC.app/Contents/MacOS/VLC "$url" &
-EOF
-
-chmod +x ~/Library/Application\ Support/vlc-handler.sh
-```
-
-#### Windows:
-Run this in PowerShell as Administrator:
-
-```powershell
-$vlcPath = "C:\Program Files\VideoLAN\VLC\vlc.exe"
-reg add "HKCR\vlc" /ve /d "URL:VLC Protocol" /f
-reg add "HKCR\vlc" /v "URL Protocol" /d "" /f
-reg add "HKCR\vlc\shell\open\command" /ve /d "`"$vlcPath`" `"%1`"" /f
-```
-
-#### Linux:
-Create a desktop file:
-
-```bash
-cat > ~/.local/share/applications/vlc-handler.desktop << 'EOF'
-[Desktop Entry]
-Type=Application
-Name=VLC Protocol Handler
-Exec=/usr/bin/vlc %u
-MimeType=x-scheme-handler/vlc
-NoDisplay=true
-EOF
-
-xdg-mime default vlc-handler.desktop x-scheme-handler/vlc
-```
+That's it! No VLC configuration needed.
 
 ## Usage
 
-### Configure VLC Path
+### Quick Start
 
-1. Click the extension icon in your browser toolbar
-2. Select your operating system (macOS, Windows, or Linux)
-3. Either use the default VLC path or enter a custom path
-4. Click "Test VLC" to verify it works
-5. Click "Save" to save your settings
+1. Click the extension icon to see instructions and test the extension
+2. Right-click on any video or page with videos
+3. Select a Vid2VLC option from the context menu
+4. Open the downloaded `.m3u` playlist file with VLC
+5. Enjoy streaming!
 
 ### Stream Videos
 
 #### Single Video:
 1. Right-click on any video element or video link
 2. Select "Add Stream to VLC" from the context menu
-3. VLC will open and start streaming the video
+3. A `.m3u` playlist file will be downloaded
+4. Open the file with VLC to start streaming
 
 #### All Videos on Page:
 1. Right-click anywhere on a page with videos
 2. Select "Add All Videos to VLC Playlist"
-3. VLC will open with all detected videos in the playlist
+3. A `.m3u` playlist file with all videos will be downloaded
+4. Open the file with VLC to play all videos
 
 ## Supported Video Sources
 
@@ -106,19 +66,20 @@ The extension can detect and stream:
 
 ## Troubleshooting
 
-### VLC Doesn't Open
-- Verify the VLC path in extension settings is correct
-- Ensure VLC protocol handler is registered (see installation instructions)
-- Check that VLC is properly installed on your system
+### Playlist File Won't Open
+- Make sure VLC is installed and set as the default application for `.m3u` files
+- Alternatively, right-click the `.m3u` file and select "Open with VLC"
+- On Linux: `vlc playlist.m3u` from terminal
 
 ### No Videos Detected
 - Some videos are loaded dynamically and may not be detected immediately
 - Try refreshing the page and waiting for videos to load
 - The extension may not detect DRM-protected videos
 
-### Permission Issues
-- Make sure Chrome has necessary permissions to access the page
-- Some sites may block context menus
+### Downloads Blocked
+- Check Chrome's download settings
+- Make sure Vid2VLC has download permissions
+- Check if your browser or antivirus is blocking downloads
 
 ## Development
 
@@ -128,8 +89,9 @@ vid2vlc/
 ├── manifest.json       # Extension configuration
 ├── background.js       # Background service worker
 ├── content.js          # Content script for page interaction
-├── popup.html          # Settings UI
-├── popup.js            # Settings logic
+├── popup.html          # Info UI
+├── popup.js            # Popup logic
+├── generate_icons.py   # Icon generator script
 ├── icons/              # Extension icons
 └── README.md           # This file
 ```
@@ -145,7 +107,8 @@ vid2vlc/
 This extension:
 - Does not collect or transmit any user data
 - Only accesses pages when activated via context menu
-- Stores VLC path configuration locally in Chrome sync storage
+- All playlist files are created locally
+- No external servers or analytics
 
 ## License
 
