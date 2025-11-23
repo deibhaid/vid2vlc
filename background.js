@@ -127,9 +127,20 @@ async function getVideosFromPage(tabId) {
       }
     });
 
-    return results[0]?.result || [];
+    // Check if results exist and have data
+    if (results && results[0] && results[0].result) {
+      return results[0].result;
+    }
+    return [];
   } catch (error) {
     console.error('Error getting videos from page:', error);
+    // Show user-friendly error notification
+    chrome.notifications.create({
+      type: 'basic',
+      iconUrl: 'icons/icon48.png',
+      title: 'Script Injection Failed',
+      message: 'Cannot access this page. Try refreshing or check if the site allows extensions.'
+    });
     return [];
   }
 }
