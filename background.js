@@ -160,10 +160,15 @@ function downloadM3UPlaylist(urls) {
   // Generate filename based on first URL
   const filename = generatePlaylistFilename(urls[0]);
   
+  console.log('Downloading playlist with filename:', filename);
+  console.log('First URL:', urls[0]);
+  
   chrome.downloads.download({
     url: dataUrl,
     filename: filename,
     saveAs: false
+  }, (downloadId) => {
+    console.log('Download started with ID:', downloadId, 'filename:', filename);
   });
 }
 
