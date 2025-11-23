@@ -166,7 +166,8 @@ function downloadM3UPlaylist(urls) {
   chrome.downloads.download({
     url: dataUrl,
     filename: filename,
-    saveAs: false
+    saveAs: true,  // Show save dialog so user can see/change filename
+    conflictAction: 'uniquify'
   }, (downloadId) => {
     console.log('Download started with ID:', downloadId, 'filename:', filename);
   });
@@ -175,33 +176,27 @@ function downloadM3UPlaylist(urls) {
 function generatePlaylistFilename(url) {
   try {
     const urlObj = new URL(url);
-    const pathParts = urlObj.pathname.split('/').filter(p => p.length > 0);
+    // Get the pathname from the URL
+    let path = urlObj.pathname;
+    // Remove leading and trailing slashes
+    path = path.replace(/^\/|\/$/g, '');
     
-    // Get the parent directory name (second-to-last part)
-    let baseName = 'vlc_playlist';
-    
-    if (pathParts.length > 1) {
-      // Use the parent directory name
-      baseName = pathParts[pathParts.length - 2];
-    } else if (pathParts.length === 1) {
-      // Use the filename without extension
-      baseName = pathParts[0].replace(/\.[^.]+$/, '');
-    } else if (urlObj.hostname) {
-      // Use hostname as fallback
-      baseName = urlObj.hostname.replace(/[^a-zA-Z0-9]/g, '_');
+    if (path) {
+      // Replace slashes with underscores and remove file extension if present
+      let filename = path.replace(/\//g, '_');
+      // Remove the file extension from the last segment if it exists
+      filename = filename.replace(/\.[^._]+$/, '');
+      // Clean up any double underscores and limit length
+      filename = filename.replace(/__+/g, '_').substring(0, 100);
+      return filename + '.m3u';
+    } else {
+      // Use hostname if no path
+      const hostname = urlObj.hostname.replace(/[^a-zA-Z0-9]/g, '_');
+      return hostname + '.m3u';
     }
-    
-    // Clean the name (remove special chars, limit length)
-    baseName = baseName.replace(/[^a-zA-Z0-9_-]/g, '_').substring(0, 50);
-    
-    // Add timestamp to make it unique
-    const timestamp = new Date().toISOString().slice(0, 19).replace(/[:.]/g, '-');
-    
-    return `${baseName}_${timestamp}.m3u`;
   } catch (error) {
-    // Fallback to simple timestamp if URL parsing fails
-    const timestamp = new Date().toISOString().slice(0, 19).replace(/[:.]/g, '-');
-    return `vlc_playlist_${timestamp}.m3u`;
+    console.error('Invalid URL:', error);
+    return 'vlc_playlist.m3u'; // Fallback filename
   }
 }
 
