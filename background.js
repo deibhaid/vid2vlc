@@ -168,40 +168,39 @@ async function getVideosFromPage(tabId) {
 }
 
 function launchVLC(urls, vlcPath, os) {
-  // Since Chrome extensions can't directly launch external apps,
-  // we'll use a custom protocol handler approach or native messaging
-  
-  // Method 1: Try native messaging (requires native host app)
-  // Method 2: Use vlc:// protocol (requires VLC to be registered)
-  // Method 3: Use browser download with custom protocol
-  
-  // For cross-platform compatibility, we'll create a playlist file
-  // and open it with a custom protocol
-  const playlistContent = createM3UPlaylist(urls);
-  
-  // Try to open VLC using custom protocol
-  const vlcUrl = buildVLCProtocolUrl(urls);
-  
-  // Open VLC URL in new tab (will trigger VLC if protocol is registered)
-  chrome.tabs.create({ url: vlcUrl, active: false }, (tab) => {
-    // Close the tab immediately
-    setTimeout(() => {
-      chrome.tabs.remove(tab.id);
-    }, 1000);
-  });
+  // For single video, try vlc:// protocol
+  if (urls.length === 1) {
+    const vlcUrl = `vlc://${urls[0]}`;
+    chrome.tabs.create({ url: vlcUrl, active: false }, (tab) => {
+      setTimeout(() => {
+        chrome.tabs.remove(tab.id);
+      }, 1000);
+    });
+  } else {
+    // For multiple videos, download M3U playlist file
+    downloadM3UPlaylist(urls);
+  }
 }
 
-function buildVLCProtocolUrl(urls) {
-  // Build VLC protocol URL
-  // Format: vlc://http://example.com/video.mp4
-  if (urls.length === 1) {
-    return `vlc://${urls[0]}`;
-  } else {
-    // For multiple URLs, we'll need to create a playlist
-    // VLC can accept playlist parameter
-    const encodedUrls = urls.map(url => encodeURIComponent(url)).join('&vlc-add=');
-    return `vlc://${urls[0]}`;
-  }
+function downloadM3UPlaylist(urls) {
+  // Create M3U playlist content
+  const playlistContent = createM3UPlaylist(urls);
+  
+  // Create blob and download
+  const blob = new Blob([playlistContent], { type: 'audio/x-mpegurl' });
+  const url = URL.createObjectURL(blob);
+  const timestamp = new Date().getTime();
+  
+  chrome.downloads.download({
+    url: url,
+    filename: `vid2vlc_playlist_${timestamp}.m3u`,
+    saveAs: false
+  }, (downloadId) => {
+    // Revoke object URL after download starts
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+    }, 1000);
+  });
 }
 
 function createM3UPlaylist(urls) {
