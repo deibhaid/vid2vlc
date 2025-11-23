@@ -154,22 +154,32 @@ function downloadM3UPlaylist(urls) {
   // Create M3U playlist content
   const playlistContent = createM3UPlaylist(urls);
   
-  // Convert to data URL (works in service workers)
-  const dataUrl = 'data:audio/x-mpegurl;charset=utf-8,' + encodeURIComponent(playlistContent);
-  
   // Generate filename based on first URL
   const filename = generatePlaylistFilename(urls[0]);
   
   console.log('Downloading playlist with filename:', filename);
   console.log('First URL:', urls[0]);
   
-  chrome.downloads.download({
-    url: dataUrl,
-    filename: filename,
-    saveAs: true,  // Show save dialog so user can see/change filename
-    conflictAction: 'uniquify'
-  }, (downloadId) => {
-    console.log('Download started with ID:', downloadId, 'filename:', filename);
+  // Inject script into page to handle download with proper blob URL
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (tabs[0]) {
+      chrome.scripting.executeScript({
+        target: { tabId: tabs[0].id },
+        func: (content, fname) => {
+          const blob = new Blob([content], { type: 'audio/x-mpegurl' });
+          const blobUrl = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = blobUrl;
+          a.download = fname;
+          a.style.display = 'none';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(blobUrl);
+        },
+        args: [playlistContent, filename]
+      });
+    }
   });
 }
 
