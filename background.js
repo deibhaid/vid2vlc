@@ -9,17 +9,17 @@ chrome.runtime.onInstalled.addListener(async () => {
 function createContextMenus() {
   // Remove existing menus
   chrome.contextMenus.removeAll(() => {
-    // Add single video stream menu
+    // Add single video stream menu (only on video/audio/link)
     chrome.contextMenus.create({
       id: 'streamToVLC',
       title: 'Add Stream to VLC',
-      contexts: ['video', 'audio', 'link', 'page']
+      contexts: ['video', 'audio', 'link']
     });
 
-    // Add all videos to playlist menu
+    // Add all videos to playlist menu (only on page, not on video/audio/link)
     chrome.contextMenus.create({
       id: 'addAllToVLC',
-      title: 'Add All Videos to VLC Playlist',
+      title: 'Add All Videos to VLC',
       contexts: ['page']
     });
   });
