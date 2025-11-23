@@ -156,13 +156,48 @@ function downloadM3UPlaylist(urls) {
   
   // Convert to data URL (works in service workers)
   const dataUrl = 'data:audio/x-mpegurl;charset=utf-8,' + encodeURIComponent(playlistContent);
-  const timestamp = new Date().getTime();
+  
+  // Generate filename based on first URL
+  const filename = generatePlaylistFilename(urls[0]);
   
   chrome.downloads.download({
     url: dataUrl,
-    filename: `vid2vlc_playlist_${timestamp}.m3u`,
+    filename: filename,
     saveAs: false
   });
+}
+
+function generatePlaylistFilename(url) {
+  try {
+    const urlObj = new URL(url);
+    const pathParts = urlObj.pathname.split('/').filter(p => p.length > 0);
+    
+    // Get the parent directory name (second-to-last part)
+    let baseName = 'vlc_playlist';
+    
+    if (pathParts.length > 1) {
+      // Use the parent directory name
+      baseName = pathParts[pathParts.length - 2];
+    } else if (pathParts.length === 1) {
+      // Use the filename without extension
+      baseName = pathParts[0].replace(/\.[^.]+$/, '');
+    } else if (urlObj.hostname) {
+      // Use hostname as fallback
+      baseName = urlObj.hostname.replace(/[^a-zA-Z0-9]/g, '_');
+    }
+    
+    // Clean the name (remove special chars, limit length)
+    baseName = baseName.replace(/[^a-zA-Z0-9_-]/g, '_').substring(0, 50);
+    
+    // Add timestamp to make it unique
+    const timestamp = new Date().toISOString().slice(0, 19).replace(/[:.]/g, '-');
+    
+    return `${baseName}_${timestamp}.m3u`;
+  } catch (error) {
+    // Fallback to simple timestamp if URL parsing fails
+    const timestamp = new Date().toISOString().slice(0, 19).replace(/[:.]/g, '-');
+    return `vlc_playlist_${timestamp}.m3u`;
+  }
 }
 
 function createM3UPlaylist(urls) {
